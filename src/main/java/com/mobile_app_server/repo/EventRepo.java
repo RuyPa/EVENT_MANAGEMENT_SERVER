@@ -54,4 +54,11 @@ public interface EventRepo extends JpaRepository<EventDto, Integer> {
             " WHERE tblEvent.id = :#{#event.id} ", nativeQuery = true)
     void updateAccessory(@Param("event") EventDto event);
 
+    @Query(value = "select ev.*, cate.name as cateName, us.name as hostname " +
+            " from tblEvent ev " +
+            " left join tblEventCategory ec on ec.eventId = ev.id " +
+            " left join tblUser us on us.id = ev.userId " +
+            " left join tblCategory cate on cate.id = ec.categoryId " +
+            " where ev.userId = :userId ", nativeQuery = true)
+    List<ResultSetQuery> getEventByUserId(@Param("userId") Integer userId);
 }

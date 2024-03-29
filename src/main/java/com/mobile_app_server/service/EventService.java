@@ -1,7 +1,10 @@
 package com.mobile_app_server.service;
 
+import com.mobile_app_server.dto.EventCategoryDto;
 import com.mobile_app_server.dto.EventDto;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface EventService {
@@ -13,4 +16,6 @@ public interface EventService {
     void deleteEventById(Integer eventId);
 
     void updateEvent(EventDto eventDto);
+
+    List<EventDto> getEventByUserId(Integer userId);
 }

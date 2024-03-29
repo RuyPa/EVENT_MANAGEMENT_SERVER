@@ -23,6 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "tblEvent")
+@Builder(builderMethodName = "hiddenBuilder")
 public class EventDto {
     @Id
     private Integer id;
@@ -60,5 +61,9 @@ public class EventDto {
         this.websiteLink = resultSetQuery.getWebsitelink();
         this.imgUrl = resultSetQuery.getImgurl();
         this.userDto = new UserDto(resultSetQuery);
+    }
+
+    public static EventDtoBuilder builder() {
+        return hiddenBuilder();
     }
 }

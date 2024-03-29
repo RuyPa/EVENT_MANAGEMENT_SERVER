@@ -34,8 +34,14 @@ public class EventController {
     }
 
     @Transactional
-    @PutMapping ResponseEntity<?> updateEvent(@RequestBody EventDto eventDto){
+    @PutMapping ()
+    public ResponseEntity<?> updateEvent(@RequestBody EventDto eventDto){
         eventService.updateEvent(eventDto);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/my_event")
+    public ResponseEntity<?> getEventsByUserId(@RequestParam("userId") Integer userId){
+        return new ResponseEntity<>(eventService.getEventByUserId(userId), HttpStatus.OK);
     }
 }

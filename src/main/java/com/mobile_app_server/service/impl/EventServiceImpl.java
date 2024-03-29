@@ -10,8 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -86,5 +85,56 @@ public class EventServiceImpl implements EventService {
                 eventCateRepo.insertEventCate(eventDto.getId(), newCateId);
             }
         });
+    }
+
+//    @Override
+//    public List<EventDto> getEventByUserId(Integer userId) {
+//        List<ResultSetQuery> resultSetQueries = eventRepo.getEventByUserId(userId);
+//
+//
+//        HashMap<Integer, List<ResultSetQuery>> hashMap = new LinkedHashMap<>();
+//        resultSetQueries.forEach(resultSetQuery -> {
+//            int eventId = resultSetQuery.getId();
+//            if(!hashMap.containsKey(eventId)){
+//                List<ResultSetQuery> setQueries = Collections.singletonList(resultSetQuery);
+//                hashMap.put(eventId, setQueries);
+//            } else{
+//                hashMap.get(eventId).add(resultSetQuery);
+//            }
+//        });
+//        Set<Integer> eventIdList = resultSetQueries.stream()
+//                                                .map(ResultSetQuery :: getId)
+//                                                .collect(Collectors.toSet());
+//        List<EventDto> result = new ArrayList<>();
+//        for(Integer eventId : eventIdList){
+//            result.add(convertData(hashMap.get(eventId)));
+//        }
+//        return result;
+//    }
+
+    @Override
+    public List<EventDto> getEventByUserId(Integer userId) {
+        List<ResultSetQuery> resultSetQueries = eventRepo.getEventByUserId(userId);
+
+        Map<Integer, List<ResultSetQuery>> eventMap = resultSetQueries.stream()
+                .collect(Collectors.groupingBy(ResultSetQuery::getId));
+
+        return eventMap.values().stream()
+                .map(this::eventDtoBuilder)
+                .collect(Collectors.toList());
+    }
+
+    public EventDto eventDtoBuilder(List<ResultSetQuery> setQueries){
+        EventDto eventDto = new EventDto();
+        for(ResultSetQuery resultSetQuery : setQueries){
+            eventDto = EventDto.builder()
+                    .id(resultSetQuery.getId())
+                    .name(resultSetQuery.getName())
+                    .startDate(resultSetQuery.getStartdate())
+                    .startTime(resultSetQuery.getStarttime())
+                    .imgUrl(resultSetQuery.getImgurl())
+                    .build();
+        }
+        return eventDto;
     }
 }
