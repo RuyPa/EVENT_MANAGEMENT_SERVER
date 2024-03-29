@@ -9,4 +9,8 @@ public interface EventService {
     void insertEvent(EventDto eventDto);
 
     EventDto getEventById(Integer eventId);
+
+    void deleteEventById(Integer eventId);
+
+    void updateEvent(EventDto eventDto);
 }

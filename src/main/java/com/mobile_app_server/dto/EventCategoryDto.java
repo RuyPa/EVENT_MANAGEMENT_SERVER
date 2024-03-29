@@ -28,4 +28,8 @@ public class EventCategoryDto {
     public EventCategoryDto(ResultSetQuery resultSetQuery) {
         this.categoryDto = new CategoryDto(resultSetQuery);
     }
+
+    public EventCategoryDto(Integer cateId){
+        this.categoryDto = new CategoryDto(cateId);
+    }
 }

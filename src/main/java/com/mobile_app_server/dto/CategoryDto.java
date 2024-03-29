@@ -27,4 +27,8 @@ public class CategoryDto {
     public CategoryDto(ResultSetQuery resultSetQuery) {
         this.name = resultSetQuery.getCatename();
     }
+
+    public CategoryDto(Integer cateId){
+        this.id = cateId;
+    }
 }

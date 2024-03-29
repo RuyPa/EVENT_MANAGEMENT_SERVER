@@ -2,7 +2,6 @@ package com.mobile_app_server.repo;
 
 import com.mobile_app_server.dto.EventDto;
 import com.mobile_app_server.dto.ResultSetQuery;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -32,4 +31,27 @@ public interface EventRepo extends JpaRepository<EventDto, Integer> {
             " :#{#event.eventVideo}, :#{#event.registrationType}, " +
             " :#{#event.websiteLink}, :#{#event.imgUrl}, :#{#event.startDate}, :#{#event.endDate})", nativeQuery = true)
     void insertAccessory(@Param("event") EventDto event);
+
+    @Modifying
+    @Query(value = "DELETE FROM tblEvent WHERE tblEvent.id = :id", nativeQuery = true)
+    void deleteEventById(@Param("id") int id);
+
+    @Modifying
+    @Query(value = "UPDATE tblEvent " +
+            "SET startdate = :#{#event.startDate}, " +
+            "   enddate = :#{#event.endDate}, " +
+            "   starttime = :#{#event.startTime}, " +
+            "   endtime = :#{#event.endTime}, " +
+            "   imgurl = :#{#event.imgUrl}, " +
+            "   websitelink = :#{#event.websiteLink}, " +
+            "   registrationtype = :#{#event.registrationType}, " +
+            "   eventvideo = :#{#event.eventVideo}, " +
+            "   des = :#{#event.des}, " +
+            "   city = :#{#event.city}, " +
+            "   location = :#{#event.location}, " +
+            "   name = :#{#event.name}, " +
+            "   address = :#{#event.address} " +
+            " WHERE tblEvent.id = :#{#event.id} ", nativeQuery = true)
+    void updateAccessory(@Param("event") EventDto event);
+
 }

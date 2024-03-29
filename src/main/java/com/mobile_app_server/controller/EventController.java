@@ -5,6 +5,7 @@ import com.mobile_app_server.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,5 +25,17 @@ public class EventController {
     public ResponseEntity<?> getEventById(@RequestParam("id") Integer eventId){
         EventDto result = eventService.getEventById(eventId);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<?> deleteEventById(@RequestParam("id")Integer eventId){
+        eventService.deleteEventById(eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Transactional
+    @PutMapping ResponseEntity<?> updateEvent(@RequestBody EventDto eventDto){
+        eventService.updateEvent(eventDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

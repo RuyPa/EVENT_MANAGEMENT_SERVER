@@ -1,6 +1,5 @@
 package com.mobile_app_server.service.impl;
 
-import com.mobile_app_server.dto.CategoryDto;
 import com.mobile_app_server.dto.EventCategoryDto;
 import com.mobile_app_server.dto.EventDto;
 import com.mobile_app_server.dto.ResultSetQuery;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -48,5 +46,45 @@ public class EventServiceImpl implements EventService {
         eventDto.setCategories(eventCategoryDtos);
 
         return eventDto;
+    }
+
+    @Transactional
+    @Override
+    public void deleteEventById(Integer eventId) {
+        eventCateRepo.deleteEventCateByEventId(eventId);
+        eventRepo.deleteEventById(eventId);
+    }
+
+    @Override
+    public void updateEvent(EventDto eventDto) {
+        List<EventCategoryDto> eventCategoryDtosBefore = covertEventCate(eventCateRepo.getEventCateByEventId(eventDto.getId()));
+        deleteUnselectedCate(eventDto, eventCategoryDtosBefore);
+        insertNewCate(eventDto, eventCategoryDtosBefore);
+        eventRepo.updateAccessory(eventDto);
+    }
+
+    private List<EventCategoryDto> covertEventCate(List<ResultSetQuery> data) {
+        return data.stream()
+                .map(dataMap -> new EventCategoryDto(dataMap.getId()))
+                .collect(Collectors.toList());
+    }
+
+    private void deleteUnselectedCate(EventDto eventDto, List<EventCategoryDto> eventCategoryDtos) {
+        eventCategoryDtos.forEach( eventCate ->{
+            int cateBeforeId = eventCate.getCategoryDto().getId();
+            if(eventDto.getCategories().stream().noneMatch(dto -> dto.getCategoryDto().getId() == cateBeforeId)){
+                eventCateRepo.deleteEventCateByEventCateId(cateBeforeId);
+            }
+        });
+    }
+
+    private void insertNewCate(EventDto eventDto, List<EventCategoryDto> eventCategoryDtosBefore) {
+        eventDto.getCategories().forEach(eventCate ->{
+            int newCateId = eventCate.getCategoryDto().getId();
+            if(eventCategoryDtosBefore.stream()
+                    .noneMatch(eventCateBefore -> eventCateBefore.getCategoryDto().getId() == newCateId)){
+                eventCateRepo.insertEventCate(eventDto.getId(), newCateId);
+            }
+        });
     }
 }
