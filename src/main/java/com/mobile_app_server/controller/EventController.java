@@ -40,7 +40,7 @@ public class EventController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/my_event")
+    @GetMapping("/my-event")
     public ResponseEntity<?> getEventsByUserId(@RequestParam("userId") Integer userId){
         return new ResponseEntity<>(eventService.getEventByUserId(userId), HttpStatus.OK);
     }
