@@ -1,5 +1,8 @@
 package com.mobile_app_server.service.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import com.mobile_app_server.config.CloudDinaryConfig;
 import com.mobile_app_server.dto.EventCategoryDto;
 import com.mobile_app_server.dto.EventDto;
 import com.mobile_app_server.dto.ResultSetQuery;
@@ -7,9 +10,12 @@ import com.mobile_app_server.repo.EventCateRepo;
 import com.mobile_app_server.repo.EventRepo;
 import com.mobile_app_server.service.EventService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,17 +25,9 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepo eventRepo;
     private final EventCateRepo eventCateRepo;
+    private final Cloudinary cloudinary;
 
-    @Transactional
-    @Override
-    public void insertEvent(EventDto eventDto) {
-        eventDto.setId(new Random().nextInt(100000000));
-        eventRepo.insertAccessory(eventDto);
-        for(EventCategoryDto dto : eventDto.getCategories()){
-            eventCateRepo.insertEventCate(eventDto.getId(), dto.getCategoryDto().getId());
-        }
-    }
-
+    
     @Override
     public EventDto getEventById(Integer eventId) {
         List<ResultSetQuery> data = eventRepo.getEventById(eventId);
@@ -87,31 +85,6 @@ public class EventServiceImpl implements EventService {
         });
     }
 
-//    @Override
-//    public List<EventDto> getEventByUserId(Integer userId) {
-//        List<ResultSetQuery> resultSetQueries = eventRepo.getEventByUserId(userId);
-//
-//
-//        HashMap<Integer, List<ResultSetQuery>> hashMap = new LinkedHashMap<>();
-//        resultSetQueries.forEach(resultSetQuery -> {
-//            int eventId = resultSetQuery.getId();
-//            if(!hashMap.containsKey(eventId)){
-//                List<ResultSetQuery> setQueries = Collections.singletonList(resultSetQuery);
-//                hashMap.put(eventId, setQueries);
-//            } else{
-//                hashMap.get(eventId).add(resultSetQuery);
-//            }
-//        });
-//        Set<Integer> eventIdList = resultSetQueries.stream()
-//                                                .map(ResultSetQuery :: getId)
-//                                                .collect(Collectors.toSet());
-//        List<EventDto> result = new ArrayList<>();
-//        for(Integer eventId : eventIdList){
-//            result.add(convertData(hashMap.get(eventId)));
-//        }
-//        return result;
-//    }
-
     @Override
     public List<EventDto> getEventByUserId(Integer userId) {
         List<ResultSetQuery> resultSetQueries = eventRepo.getEventByUserId(userId);
@@ -123,6 +96,7 @@ public class EventServiceImpl implements EventService {
                 .map(this::eventDtoBuilder)
                 .collect(Collectors.toList());
     }
+
 
     public EventDto eventDtoBuilder(List<ResultSetQuery> setQueries){
         EventDto eventDto = new EventDto();
@@ -136,5 +110,25 @@ public class EventServiceImpl implements EventService {
                     .build();
         }
         return eventDto;
+    }
+
+    @Override
+    @Transactional
+    public void insertEventV2(EventDto eventDto, MultipartFile file) throws IOException {
+
+        String imgUrl = uploadFileAndGetUrl(file);
+        eventDto.setId(new Random().nextInt(100000000));
+        eventDto.setImgUrl(imgUrl);
+
+        eventRepo.insertAccessory(eventDto);
+        for(EventCategoryDto dto : eventDto.getCategories()){
+            eventCateRepo.insertEventCate(eventDto.getId(), dto.getCategoryDto().getId());
+        }
+    }
+
+    public String uploadFileAndGetUrl(MultipartFile file) throws IOException {
+
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+        return (String) uploadResult.get("secure_url");
     }
 }

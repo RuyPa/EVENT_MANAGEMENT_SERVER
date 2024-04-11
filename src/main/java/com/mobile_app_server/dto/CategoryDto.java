@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Getter
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @NoArgsConstructor
 @Entity
 @Table(name = "tblCategory")
+@ToString
 public class CategoryDto {
     @Id
     private Integer id;

@@ -5,10 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Getter
@@ -19,6 +16,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @NoArgsConstructor
 @Entity
 @Table(name = "tblEventCategory")
+@ToString
 public class EventCategoryDto {
     @Id
     private Integer id;
