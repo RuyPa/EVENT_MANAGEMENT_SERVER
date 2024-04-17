@@ -47,7 +47,8 @@ public class EventServiceImpl implements EventService {
 
     @Transactional
     @Override
-    public void deleteEventById(Integer eventId) {
+    public void deleteEventById(Integer eventId) throws IOException {
+        cloudinary.uploader().destroy(getEventById(eventId).getImgUrl(), ObjectUtils.emptyMap());
         eventCateRepo.deleteEventCateByEventId(eventId);
         eventRepo.deleteEventById(eventId);
     }
@@ -62,6 +63,7 @@ public class EventServiceImpl implements EventService {
 
     private List<EventCategoryDto> covertEventCate(List<ResultSetQuery> data) {
         return data.stream()
+
                 .map(dataMap -> new EventCategoryDto(dataMap.getId()))
                 .collect(Collectors.toList());
     }
@@ -106,6 +108,7 @@ public class EventServiceImpl implements EventService {
                     .name(resultSetQuery.getName())
                     .startDate(resultSetQuery.getStartdate())
                     .startTime(resultSetQuery.getStarttime())
+                    .location(resultSetQuery.getLocation())
                     .imgUrl(resultSetQuery.getImgurl())
                     .build();
         }
@@ -119,7 +122,6 @@ public class EventServiceImpl implements EventService {
         String imgUrl = uploadFileAndGetUrl(file);
         eventDto.setId(new Random().nextInt(100000000));
         eventDto.setImgUrl(imgUrl);
-
         eventRepo.insertAccessory(eventDto);
         for(EventCategoryDto dto : eventDto.getCategories()){
             eventCateRepo.insertEventCate(eventDto.getId(), dto.getCategoryDto().getId());
@@ -130,5 +132,44 @@ public class EventServiceImpl implements EventService {
 
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
         return (String) uploadResult.get("secure_url");
+    }
+
+    @Override
+    @Transactional
+    public void insertEventV1(EventDto eventDto) {
+        eventDto.setId(new Random().nextInt(100000000));
+        eventDto.setImgUrl("tesst");
+
+        eventRepo.insertAccessory(eventDto);
+        for(EventCategoryDto dto : eventDto.getCategories()){
+            eventCateRepo.insertEventCate(eventDto.getId(), dto.getCategoryDto().getId());
+        }
+    }
+
+    @Override
+    public void updateEventV2(EventDto eventDto, MultipartFile file) throws IOException {
+        List<EventCategoryDto> eventCategoryDtosBefore = covertEventCate(eventCateRepo.getEventCateByEventId(eventDto.getId()));
+        deleteUnselectedCate(eventDto, eventCategoryDtosBefore);
+        insertNewCate(eventDto, eventCategoryDtosBefore);
+        updateImage(eventDto, file);
+        eventRepo.updateAccessory(eventDto);
+    }
+
+    private void updateImage(EventDto eventDto, MultipartFile file) throws IOException {
+        String publicOldId = getPublicIdFromUrl(eventDto.getImgUrl());
+        Map<String, Object> updateParams = ObjectUtils.asMap(
+                "type", "upload",
+                "public_id", publicOldId,
+                "overwrite", true
+        );
+        cloudinary.uploader().upload(file.getBytes(), updateParams);
+    }
+
+    public static String getPublicIdFromUrl(String imageUrl) {
+
+        String[] parts = imageUrl.split("/");
+        String publicIdWithExtension = parts[parts.length - 1];
+        String[] idParts = publicIdWithExtension.split("\\.");
+        return idParts[0];
     }
 }

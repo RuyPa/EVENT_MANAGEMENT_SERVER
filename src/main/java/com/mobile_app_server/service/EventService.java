@@ -13,11 +13,15 @@ public interface EventService {
 
     EventDto getEventById(Integer eventId);
 
-    void deleteEventById(Integer eventId);
+    void deleteEventById(Integer eventId) throws IOException;
 
     void updateEvent(EventDto eventDto);
 
     List<EventDto> getEventByUserId(Integer userId);
 
     void insertEventV2(EventDto eventDto, MultipartFile file) throws IOException;
+
+    void insertEventV1(EventDto eventDto);
+
+    void updateEventV2(EventDto eventDto, MultipartFile file) throws IOException;
 }

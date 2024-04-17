@@ -29,4 +29,9 @@ public class CategoryDto {
     public CategoryDto(Integer cateId){
         this.id = cateId;
     }
+
+    public CategoryDto(Integer id, String name){
+        this.id = id;
+        this.name = name;
+    }
 }

@@ -29,17 +29,17 @@ public class EventController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<?> deleteEventById(@RequestParam("id")Integer eventId){
+    public ResponseEntity<?> deleteEventById(@RequestParam("id")Integer eventId) throws IOException {
         eventService.deleteEventById(eventId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Transactional
-    @PutMapping ()
-    public ResponseEntity<?> updateEvent(@RequestBody EventDto eventDto){
-        eventService.updateEvent(eventDto);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//    @Transactional
+//    @PutMapping ()
+//    public ResponseEntity<?> updateEvent(@RequestBody EventDto eventDto){
+//        eventService.updateEvent(eventDto);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
     @GetMapping("/my-event")
     public ResponseEntity<?> getEventsByUserId(@RequestParam("userId") Integer userId){
@@ -53,4 +53,18 @@ public class EventController {
         eventService.insertEventV2(eventDto, file);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @Transactional
+    @PutMapping (value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateEventv2(@RequestParam("file") MultipartFile file,
+                                           @ModelAttribute EventDto eventDto) throws IOException {
+        eventService.updateEventV2(eventDto,file);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+//    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<?> insertEventV1(@ModelAttribute EventDto eventDto) throws IOException {
+//        eventService.insertEventV1(eventDto);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 }

@@ -20,7 +20,7 @@ import java.time.LocalDate;
 @ToString
 public class UserDto {
     @Id
-    private String id;
+    private Integer id;
     private String username;
     private String password;
     private String name;
