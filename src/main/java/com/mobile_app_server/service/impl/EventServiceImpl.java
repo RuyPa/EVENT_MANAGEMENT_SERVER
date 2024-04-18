@@ -151,25 +151,31 @@ public class EventServiceImpl implements EventService {
         List<EventCategoryDto> eventCategoryDtosBefore = covertEventCate(eventCateRepo.getEventCateByEventId(eventDto.getId()));
         deleteUnselectedCate(eventDto, eventCategoryDtosBefore);
         insertNewCate(eventDto, eventCategoryDtosBefore);
-        updateImage(eventDto, file);
+        updateImg(eventDto, file);
         eventRepo.updateAccessory(eventDto);
     }
 
-    private void updateImage(EventDto eventDto, MultipartFile file) throws IOException {
-        String publicOldId = getPublicIdFromUrl(eventDto.getImgUrl());
-        Map<String, Object> updateParams = ObjectUtils.asMap(
-                "type", "upload",
-                "public_id", publicOldId,
-                "overwrite", true
-        );
-        cloudinary.uploader().upload(file.getBytes(), updateParams);
+    private void updateImg(EventDto eventDto, MultipartFile file) throws IOException {
+        cloudinary.uploader().destroy(eventDto.getImgUrl(), ObjectUtils.emptyMap());
+        String newImgUrl = uploadFileAndGetUrl(file);
+        eventDto.setImgUrl(newImgUrl);
     }
 
-    public static String getPublicIdFromUrl(String imageUrl) {
+//    private void updateImage(EventDto eventDto, MultipartFile file) throws IOException {
+//        String publicOldId = getPublicIdFromUrl(eventDto.getImgUrl());
+//        Map<String, Object> updateParams = ObjectUtils.asMap(
+//                "type", "upload",
+//                "public_id", publicOldId,
+//                "overwrite", true
+//        );
+//        cloudinary.uploader().upload(file.getBytes(), updateParams);
+//    }
 
-        String[] parts = imageUrl.split("/");
-        String publicIdWithExtension = parts[parts.length - 1];
-        String[] idParts = publicIdWithExtension.split("\\.");
-        return idParts[0];
-    }
+//    public static String getPublicIdFromUrl(String imageUrl) {
+//
+//        String[] parts = imageUrl.split("/");
+//        String publicIdWithExtension = parts[parts.length - 1];
+//        String[] idParts = publicIdWithExtension.split("\\.");
+//        return idParts[0];
+//    }
 }

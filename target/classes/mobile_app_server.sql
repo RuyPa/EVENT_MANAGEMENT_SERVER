@@ -72,3 +72,11 @@ insert into tblevent ( userId, name, starttime, endtime, location,
 
 insert into tbleventcategory(eventId, categoryId) values( 1, 4);
 insert into tbleventcategory(eventId, categoryId) values( 1, 5);
+
+use mobileapp;
+alter table tblschedule add name varchar(255);
+alter table tblschedule add startTime varchar(255);
+alter table tblschedule add endTime varchar(255);
+alter table tblschedule add endDate date;
+alter table tblschedule add startDate date;
+alter table tblschedule add des varchar(255);
