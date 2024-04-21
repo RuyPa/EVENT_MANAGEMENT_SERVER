@@ -20,6 +20,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "tblSchedule")
+@Builder(builderMethodName = "hiddenBuilder")
 public class ScheduleDto {
 
     @Id
@@ -32,6 +33,7 @@ public class ScheduleDto {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
     private String des;
+    private String location;
     @Transient
     private EventDto eventDto;
 
@@ -42,6 +44,11 @@ public class ScheduleDto {
         this.endDate = resultSetQuery.getEnddate();
         this.startTime = resultSetQuery.getStarttime();
         this.endTime = resultSetQuery.getEndtime();
+        this.location = resultSetQuery.getLocation();
         this.des = resultSetQuery.getDes();
+    }
+
+    public static ScheduleDto.ScheduleDtoBuilder builder() {
+        return hiddenBuilder();
     }
 }

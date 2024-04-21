@@ -14,10 +14,10 @@ import java.util.List;
 public interface ScheduleRepo extends JpaRepository<ScheduleDto, Integer> {
 
     @Modifying
-    @Query(value = "INSERT INTO tblschedule (name, startTime, endTime, startDate, endDate, des, eventId) " +
+    @Query(value = "INSERT INTO tblschedule (name, startTime, endTime, startDate, endDate, des,location, eventId) " +
             " VALUES ( :#{#dto.name}, :#{#dto.startTime}, " +
             " :#{#dto.endTime}, :#{#dto.startDate}, :#{#dto.endDate}, " +
-            ":#{#dto.des}, :#{#dto.eventDto.id} )  ", nativeQuery = true)
+            ":#{#dto.des}, :#{#dto.location},:#{#dto.eventDto.id} )  ", nativeQuery = true)
     void insertSchedule(@Param("dto") ScheduleDto dto);
 
     @Modifying
@@ -31,7 +31,8 @@ public interface ScheduleRepo extends JpaRepository<ScheduleDto, Integer> {
             " startDate = :#{#dto.startDate}, " +
             " endTime = :#{#dto.endTime}, " +
             " endDate = :#{#dto.endDate}, " +
-            " des = :#{#dto.des} " +
+            " des = :#{#dto.des}, " +
+            " location = :#{#dto.location} " +
             " where tblschedule.id = :#{#dto.id}", nativeQuery = true)
     void updateSchedule(@Param("dto") ScheduleDto dto);
 
@@ -42,6 +43,7 @@ public interface ScheduleRepo extends JpaRepository<ScheduleDto, Integer> {
 
     @Query(value = "select s.* " +
             " from tblschedule s " +
-            " where s.id = :id", nativeQuery = true)
+            " where s.id = :id " +
+            " order by s.startDate ", nativeQuery = true)
     ResultSetQuery getScheduleById(@Param("id") Integer id);
 }

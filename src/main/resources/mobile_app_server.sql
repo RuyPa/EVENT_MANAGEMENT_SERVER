@@ -80,3 +80,5 @@ alter table tblschedule add endTime varchar(255);
 alter table tblschedule add endDate date;
 alter table tblschedule add startDate date;
 alter table tblschedule add des varchar(255);
+use mobileapp;
+alter table tblschedule add location varchar(255);

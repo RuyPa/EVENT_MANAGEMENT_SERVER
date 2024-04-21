@@ -1,5 +1,6 @@
 package com.mobile_app_server.service.impl;
 
+import com.mobile_app_server.dto.ResultSetQuery;
 import com.mobile_app_server.dto.ScheduleDto;
 import com.mobile_app_server.repo.ScheduleRepo;
 import com.mobile_app_server.service.ScheduleService;
@@ -7,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,8 +42,46 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public List<ScheduleDto> getAllSchedule(Integer eventId) {
-        return scheduleRepo.getAllSchedule(eventId).stream()
-                .map(ScheduleDto::new)
-                .collect(Collectors.toList());
+
+        List<ScheduleDto> scheduleDtos = new ArrayList<>();
+
+        for (ResultSetQuery query : scheduleRepo.getAllSchedule(eventId)) {
+            if (query.getStartdate().equals(query.getEnddate())) {
+                scheduleDtos.add(ScheduleDto.builder()
+                        .id(query.getId())
+                        .name(query.getName())
+                        .des(query.getDes())
+                        .location(query.getLocation())
+                        .startDate(query.getStartdate())
+                        .startTime(query.getStarttime())
+                        .endDate(query.getEnddate())
+                        .endTime(query.getEndtime()).build());
+            } else {
+
+                scheduleDtos.add(ScheduleDto.builder()
+                        .id(query.getId())
+                        .name(query.getName())
+                        .des(query.getDes())
+                        .location(query.getLocation())
+                        .startDate(query.getStartdate())
+                        .startTime(query.getStarttime())
+                        .endDate(null)
+                        .endTime(null).build());
+
+                if (query.getEndtime() != null) {
+                    scheduleDtos.add(ScheduleDto.builder()
+                            .id(query.getId())
+                            .name(query.getName())
+                            .des(query.getDes())
+                            .location(query.getLocation())
+                            .startDate(null)
+                            .startTime(null)
+                            .endDate(query.getEnddate())
+                            .endTime(query.getEndtime()).build());
+                }
+            }
+        }
+
+        return scheduleDtos;
     }
 }
