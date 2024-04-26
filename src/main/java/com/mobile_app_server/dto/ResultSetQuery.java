@@ -20,4 +20,5 @@ public interface ResultSetQuery {
     Date getStartdate();
     Date getEnddate();
     String getCatename();
+    Integer getChecked();
 }

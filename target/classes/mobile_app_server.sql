@@ -65,7 +65,7 @@ insert into tbluser (username, password, name, dob, phonenumber) values ("ruypa"
 insert into tblevent ( userId, name, starttime, endtime, location, 
 						address, city, des, eventvideo, registrationtype, 
 						websitelink, imgurl, startdate, enddate) 
-			values (1, "Ptit tour", "06:00 am", "08:00 pm", "PTIT", "Nguyen Trai km12", 
+			values (89446771, "Ptit tour", "06:00 am", "08:00 pm", "PTIT", "Nguyen Trai km12", 
 					"Ha Noi", "very fun", "link", "venue", "link", 
                     "https://res.cloudinary.com/dkf74ju3o/image/upload/v1711613331/lu9evkymo1e0butoq7zb.png", 
                     "2024-03-31", "2024-03-31");
@@ -80,5 +80,25 @@ alter table tblschedule add endTime varchar(255);
 alter table tblschedule add endDate date;
 alter table tblschedule add startDate date;
 alter table tblschedule add des varchar(255);
-use mobileapp;
 alter table tblschedule add location varchar(255);
+
+use mobileapp;
+alter table tbltask add name varchar(255);
+alter table tbltask add startTime varchar(255);
+alter table tbltask add startDate date;
+alter table tbltask add des varchar(255);
+
+use mobileapp;
+insert into  tbltask(eventId, name, startTime, startDate, des) values (89446771, "Buy candies", "12:00", "2023-03-04","");
+use mobileapp;
+insert into  tbltask(eventId, name, startTime, startDate, des) values (89446771, "Meet supplier", "17:00", "2023-03-04","");
+insert into  tbltask(eventId, name, startTime, startDate, des) values (89446771, "Decorate Car", "22:00", "2023-03-04","");
+insert into  tbltask(eventId, name, startTime, startDate, des) values (89446771, "Check task", "", "2023-03-04","");
+insert into  tbltask(eventId, name, startTime, startDate, des) values (89446771, "Get schedule", "", "2023-03-04","");
+insert into  tbltask(eventId, name, startTime, startDate, des) values (89446771, "Clean the car", "", "2023-03-04","");
+insert into  tbltask(eventId, name, startTime, startDate, des) values (89446771, "Meet supplier", "05:00", "2023-03-05","");
+insert into  tbltask(eventId, name, startTime, startDate, des) values (89446771, "Go party to get infor", "06:00", "2023-03-08","");
+insert into  tbltask(eventId, name, startTime, startDate, des) values (89446771, "Deal with guest", "08:00", "2023-03-08","");
+
+use mobileapp;
+alter table tbltask add checked int;

@@ -38,7 +38,7 @@ public interface ScheduleRepo extends JpaRepository<ScheduleDto, Integer> {
 
     @Query(value = "select s.* " +
             " from tblschedule s " +
-            " where s.eventId = :eventId",nativeQuery = true)
+            " where s.eventId = :eventId", nativeQuery = true)
     List<ResultSetQuery> getAllSchedule(@Param("eventId") Integer eventId);
 
     @Query(value = "select s.* " +
