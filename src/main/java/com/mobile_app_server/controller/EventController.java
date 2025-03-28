@@ -5,6 +5,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.mobile_app_server.dto.EventDto;
 import com.mobile_app_server.service.EventService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,12 @@ import java.util.Map;
 public class EventController {
 
     private final EventService eventService;
+
+    @GetMapping("/hello")
+    public String hello(){
+        System.out.println("duyyy");
+        return "Hello World";
+    }
 
     @GetMapping()
     public ResponseEntity<?> getEventById(@RequestParam("id") Integer eventId){
@@ -43,6 +50,7 @@ public class EventController {
 
     @GetMapping("/my-event")
     public ResponseEntity<?> getEventsByUserId(@RequestParam("userId") Integer userId){
+        System.out.println("duy");
         return new ResponseEntity<>(eventService.getEventByUserId(userId), HttpStatus.OK);
     }
 
