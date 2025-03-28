@@ -10,6 +10,8 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +27,11 @@ import java.util.List;
 @Entity
 @Table(name = "tblEvent")
 @Builder(builderMethodName = "hiddenBuilder")
-public class EventDto {
+public class EventDto implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Id
     private Integer id;
     private String name;

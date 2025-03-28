@@ -2,7 +2,6 @@ package com.mobile_app_server.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.mobile_app_server.config.CloudDinaryConfig;
 import com.mobile_app_server.dto.EventCategoryDto;
 import com.mobile_app_server.dto.EventDto;
 import com.mobile_app_server.dto.ResultSetQuery;
@@ -10,15 +9,20 @@ import com.mobile_app_server.repo.EventCateRepo;
 import com.mobile_app_server.repo.EventRepo;
 import com.mobile_app_server.service.EventService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class EventServiceImpl implements EventService {
@@ -26,8 +30,10 @@ public class EventServiceImpl implements EventService {
     private final EventRepo eventRepo;
     private final EventCateRepo eventCateRepo;
     private final Cloudinary cloudinary;
+    private final StringRedisTemplate redisTemplate;
 
-    
+
+
     @Override
     public EventDto getEventById(Integer eventId) {
         List<ResultSetQuery> data = eventRepo.getEventById(eventId);
@@ -69,40 +75,51 @@ public class EventServiceImpl implements EventService {
     }
 
     private void deleteUnselectedCate(EventDto eventDto, List<EventCategoryDto> eventCategoryDtos) {
-        eventCategoryDtos.forEach( eventCate ->{
+        eventCategoryDtos.forEach(eventCate -> {
             int cateBeforeId = eventCate.getCategoryDto().getId();
-            if(eventDto.getCategories().stream().noneMatch(dto -> dto.getCategoryDto().getId() == cateBeforeId)){
+            if (eventDto.getCategories().stream().noneMatch(dto -> dto.getCategoryDto().getId() == cateBeforeId)) {
                 eventCateRepo.deleteEventCateByEventCateId(cateBeforeId);
             }
         });
     }
 
     private void insertNewCate(EventDto eventDto, List<EventCategoryDto> eventCategoryDtosBefore) {
-        eventDto.getCategories().forEach(eventCate ->{
+        eventDto.getCategories().forEach(eventCate -> {
             int newCateId = eventCate.getCategoryDto().getId();
-            if(eventCategoryDtosBefore.stream()
-                    .noneMatch(eventCateBefore -> eventCateBefore.getCategoryDto().getId() == newCateId)){
+            if (eventCategoryDtosBefore.stream()
+                    .noneMatch(eventCateBefore -> eventCateBefore.getCategoryDto().getId() == newCateId)) {
                 eventCateRepo.insertEventCate(eventDto.getId(), newCateId);
             }
         });
     }
 
+    @Cacheable(value = "EVENT-CACHE", key = "#userId")
     @Override
     public List<EventDto> getEventByUserId(Integer userId) {
+        redisTemplate.opsForValue().set("testKey", "Hello Redis!");
+        String value = redisTemplate.opsForValue().get("testKey");
+        System.out.println("A"+value);
+
         List<ResultSetQuery> resultSetQueries = eventRepo.getEventByUserId(userId);
+        if (resultSetQueries.isEmpty()) {
+            log.warn("No events found for userId: {}", userId);
+        }
 
         Map<Integer, List<ResultSetQuery>> eventMap = resultSetQueries.stream()
                 .collect(Collectors.groupingBy(ResultSetQuery::getId));
 
-        return eventMap.values().stream()
+        List<EventDto> events = eventMap.values().stream()
                 .map(this::eventDtoBuilder)
                 .collect(Collectors.toList());
+
+        log.info("Returning {} events for userId: {}", events.size(), userId);
+        return events;
     }
 
 
-    public EventDto eventDtoBuilder(List<ResultSetQuery> setQueries){
+    public EventDto eventDtoBuilder(List<ResultSetQuery> setQueries) {
         EventDto eventDto = new EventDto();
-        for(ResultSetQuery resultSetQuery : setQueries){
+        for (ResultSetQuery resultSetQuery : setQueries) {
             eventDto = EventDto.builder()
                     .id(resultSetQuery.getId())
                     .name(resultSetQuery.getName())
@@ -123,7 +140,7 @@ public class EventServiceImpl implements EventService {
         eventDto.setId(new Random().nextInt(100000000));
         eventDto.setImgUrl(imgUrl);
         eventRepo.insertAccessory(eventDto);
-        for(EventCategoryDto dto : eventDto.getCategories()){
+        for (EventCategoryDto dto : eventDto.getCategories()) {
             eventCateRepo.insertEventCate(eventDto.getId(), dto.getCategoryDto().getId());
         }
     }
@@ -141,7 +158,7 @@ public class EventServiceImpl implements EventService {
         eventDto.setImgUrl("tesst");
 
         eventRepo.insertAccessory(eventDto);
-        for(EventCategoryDto dto : eventDto.getCategories()){
+        for (EventCategoryDto dto : eventDto.getCategories()) {
             eventCateRepo.insertEventCate(eventDto.getId(), dto.getCategoryDto().getId());
         }
     }
