@@ -5,6 +5,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.mobile_app_server.dto.EventDto;
 import com.mobile_app_server.service.EventService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,13 +20,15 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/events")
 @RequiredArgsConstructor
+@Slf4j
 public class EventController {
 
     private final EventService eventService;
 
     @GetMapping("/hello")
     public String hello(){
-        System.out.println("duyyy");
+        String message = "Duy dz";
+        log.info("duy da boi vao day {}", message);
         return "Hello World";
     }
 

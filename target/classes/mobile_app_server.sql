@@ -56,13 +56,13 @@ create table tblSchedule(
     foreign key (eventId) references tblEvent(id)
 );
 
-insert into tblcategory (name) values("kids");
-insert into tblcategory (name) values("virtual");
-insert into tblcategory (name) values("tour");
+insert into tblCategory (name) values("kids");
+insert into tblCategory (name) values("virtual");
+insert into tblCategory (name) values("tour");
 
-insert into tbluser (username, password, name, dob, phonenumber) values ("ruypa", "123456", "Duy", "2002-12-10", "0123456789");
+insert into tblUser (username, password, name, dob, phonenumber) values ("ruypa", "123456", "Duy", "2002-12-10", "0123456789");
 
-insert into tblevent ( userId, name, starttime, endtime, location, 
+insert into tblEvent ( userId, name, starttime, endtime, location,
 						address, city, des, eventvideo, registrationtype, 
 						websitelink, imgurl, startdate, enddate) 
 			values (89446771, "Ptit tour", "06:00 am", "08:00 pm", "PTIT", "Nguyen Trai km12", 
