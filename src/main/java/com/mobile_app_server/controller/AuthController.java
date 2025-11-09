@@ -2,6 +2,8 @@ package com.mobile_app_server.controller;
 
 import com.mobile_app_server.dto.UserLoginDto;
 import com.mobile_app_server.security.jwt.JwtUtil;
+import com.mobile_app_server.service.AuthService;
+import com.mobile_app_server.service.impl.ProcessingService;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,30 +16,40 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final AuthService authService;
+    private final ProcessingService processingService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
+    public AuthController(AuthService authService,
+                          ProcessingService processingService) {
+
+        this.authService = authService;
+        this.processingService = processingService;
+
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDto userLoginDto) {
 
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        userLoginDto.getUsername(),
-                        userLoginDto.getPassword()
-                )
-        );
+        return authService.login(userLoginDto);
+    }
 
-        String jwt = jwtUtil.getJwtSecret(auth);
+    @GetMapping("/process")
+    public ResponseEntity<?> process() {
+        List<String> records = IntStream.rangeClosed(1, 100)
+                .mapToObj(i -> "record-payload-" + i + "-some-data")
+                .collect(Collectors.toList());
 
-        return new ResponseEntity<>(jwt, HttpStatus.OK);
+        // submit tasks
+        processingService.processRecords(records);
+        return ResponseEntity.ok().body("duy");
     }
 }

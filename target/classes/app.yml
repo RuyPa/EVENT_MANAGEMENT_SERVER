@@ -1,0 +1,6 @@
+app:
+  keystore:
+    path: classpath:signer.p12
+    store-password: 123456
+    key-alias: mykey
+    key-password: 123456

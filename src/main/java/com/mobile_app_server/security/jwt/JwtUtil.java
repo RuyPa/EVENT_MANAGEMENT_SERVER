@@ -23,13 +23,17 @@ public class JwtUtil {
 
     private static final String JWT_SECRET =
             "KfWl4gkYFWy2s9YX4ko3BStUmkRjR8/4toz1Lk34DAGB8h7dGmDU6RPYbQnFcbp2TkjF6eH0N7PSM0JkQp6lPg==";
+    private static final Integer ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 160;
+    private static final Integer REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 7 * 24 * 60;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(JWT_SECRET));
     }
-    public String getJwtSecret(Authentication authentication) {
+    public String generateJwtSecret(Authentication authentication, boolean isAccessToken) {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        int expirationTime;
+
 
         log.info("Authorities raw: {}", userDetails.getAuthorities());
 
@@ -44,11 +48,18 @@ public class JwtUtil {
         log.info("Extracted roles: {}", roles);
 
 
+        if (isAccessToken) {
+            expirationTime = ACCESS_TOKEN_EXPIRATION_TIME;
+        } else {
+            expirationTime = REFRESH_TOKEN_EXPIRATION_TIME;
+        }
+
+
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
 
