@@ -3,6 +3,7 @@ package com.mobile_app_server.controller;
 import com.mobile_app_server.dto.UserLoginDto;
 import com.mobile_app_server.security.jwt.JwtUtil;
 import com.mobile_app_server.service.AuthService;
+import com.mobile_app_server.service.impl.KafkaProducerService;
 import com.mobile_app_server.service.impl.ProcessingService;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +28,15 @@ public class AuthController {
 
     private final AuthService authService;
     private final ProcessingService processingService;
+    private final KafkaProducerService kafkaProducerService;
 
     public AuthController(AuthService authService,
-                          ProcessingService processingService) {
+                          ProcessingService processingService,
+                          KafkaProducerService kafkaProducerService) {
 
         this.authService = authService;
         this.processingService = processingService;
-
+        this.kafkaProducerService = kafkaProducerService;
     }
 
     @PostMapping("/login")
@@ -51,5 +54,11 @@ public class AuthController {
         // submit tasks
         processingService.processRecords(records);
         return ResponseEntity.ok().body("duy");
+    }
+
+    @GetMapping("/send-kafka")
+    public ResponseEntity<?> sendKafka() {
+        kafkaProducerService.sendMessage("duy dz");
+        return ResponseEntity.ok().body(HttpStatus.OK);
     }
 }

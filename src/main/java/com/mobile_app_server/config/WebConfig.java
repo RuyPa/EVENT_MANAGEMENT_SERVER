@@ -1,8 +1,11 @@
 package com.mobile_app_server.config;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
+@Slf4j
 public class WebConfig {
 
     @Bean
@@ -52,13 +56,23 @@ public class WebConfig {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(8);           // số luồng giữ nóng
         executor.setMaxPoolSize(20);           // max
-        executor.setQueueCapacity(200);        // hàng đợi
+        executor.setQueueCapacity(50);        // hàng đợi
         executor.setKeepAliveSeconds(30);
         executor.setThreadNamePrefix("rec-exec-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+//        executor.setRejectedExecutionHandler((r, exec) -> {
+//            log.error("[POOL FULL] Task {} rejected. Active={}, QueueSize={}, Max={}",
+//                    r, exec.getActiveCount(), exec.getQueue().size(), exec.getMaximumPoolSize());
+//        });
+
         executor.initialize();
         return executor;
     }
 
-
+    public NewTopic topicExample() {
+        return TopicBuilder.name("test-topic")
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
 }

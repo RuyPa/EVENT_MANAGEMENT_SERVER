@@ -4,3 +4,17 @@ app:
     store-password: 123456
     key-alias: mykey
     key-password: 123456
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092  # Địa chỉ Kafka broker
+    consumer:
+      group-id: my-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    listener:
+      missing-topics-fatal: false  # nếu topic chưa có, không lỗi

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -17,6 +18,8 @@ public class ProcessingService {
     public ProcessingService(@Qualifier("recordTaskExecutor") TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
     }
+
+    public static AtomicInteger count = new AtomicInteger(0);
 
     public void processRecords(List<String> records) {
         log.info("Starting processRecords at {} totalRecords={}", Instant.now(), records.size());
@@ -35,6 +38,7 @@ public class ProcessingService {
         String threadName = Thread.currentThread().getName();
         log.info("[Task] start id={} thread={}", id, threadName);
         try {
+            log.warn("count {}", count.incrementAndGet());
             // mô phỏng xử lý nặng (ví dụ đọc file, gọi API, v.v.)
             Thread.sleep(100 + (long) (Math.random() * 400));
             log.info("[Task] processing id={} payloadLen={}", id, r.length());
