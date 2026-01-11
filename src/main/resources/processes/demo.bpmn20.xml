@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:activiti="http://activiti.org/bpmn"
+             targetNamespace="http://activiti.org/test">
+
+    <process id="simpleProcess" name="Simple Process" isExecutable="true">
+
+        <startEvent id="startEvent" />
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="serviceTask" />
+
+        <serviceTask id="serviceTask" name="Print Hello" activiti:class="com.mobile_app_server.service.impl.PrintHelloTask" />
+        <sequenceFlow id="flow2" sourceRef="serviceTask" targetRef="endEvent" />
+
+        <endEvent id="endEvent" />
+
+    </process>
+
+</definitions>
